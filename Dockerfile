@@ -3,8 +3,3 @@ WORKDIR /app
 COPY . .
 RUN pip install playwright
 CMD ["python", "main.py"]
-```
-
-`requirements.txt`:
-```
-playwright
