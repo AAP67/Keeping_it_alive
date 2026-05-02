@@ -1,0 +1,54 @@
+name: Keep Streamlit Apps Alive
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours
+  workflow_dispatch: # manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Ping all apps
+        run: |
+          python -c "
+          from playwright.sync_api import sync_playwright
+          import time
+
+          URLS = [
+              'https://equity-research-ai-francium77.streamlit.app',
+              'https://arkanex-tao.streamlit.app',
+              'https://deal-sourcing-francium77.streamlit.app',
+              'https://arkanex-ai-interviewer.streamlit.app',
+              'https://arkanexconsultant.streamlit.app',
+              'https://arkanecos.streamlit.app',
+              'https://mortgage-servicing-orchestrator-8rdfdosxdktbseaxunynfc.streamlit.app',
+              'https://mortgage-orchestrator-langgraph-bdritappvbz63jgscch4pmj.streamlit.app',
+              'https://arkanexjyotish.streamlit.app',
+          ]
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              for url in URLS:
+                  try:
+                      page = browser.new_page()
+                      page.goto(url, wait_until='networkidle', timeout=60000)
+                      time.sleep(10)
+                      page.close()
+                      print(f'✓ {url}')
+                  except Exception as e:
+                      print(f'✗ {url} — {e}')
+              browser.close()
+          "
