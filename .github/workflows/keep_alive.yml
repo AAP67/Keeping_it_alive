@@ -8,7 +8,7 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -46,9 +46,18 @@ jobs:
                   try:
                       page = browser.new_page()
                       page.goto(url, wait_until='domcontentloaded', timeout=90000)
-                      time.sleep(15)
+                      time.sleep(5)
+
+                      # Click the wake-up button if the app is sleeping
+                      wake_btn = page.locator('button:has-text(\"Yes, get this app back up\")')
+                      if wake_btn.count() > 0:
+                          wake_btn.click()
+                          print(f'⏰ {url} — clicked wake-up button, waiting...')
+                          time.sleep(30)
+                      else:
+                          print(f'✓ {url} — already awake')
+
                       page.close()
-                      print(f'✓ {url}')
                   except Exception as e:
                       print(f'✗ {url} — {e}')
               browser.close()
