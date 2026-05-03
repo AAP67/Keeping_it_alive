@@ -1,5 +1,5 @@
-FROM mcr.microsoft.com/playwright/python:v1.58.0-jammy
+FROM python:3.11-slim
 WORKDIR /app
-COPY . .
-RUN pip install playwright
-CMD ["python", "main.py"]
+RUN pip install requests
+COPY main.py .
+CMD ["python", "-u", "main.py"]
