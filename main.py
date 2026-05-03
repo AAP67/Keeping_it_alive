@@ -1,5 +1,4 @@
-# main.py
-from playwright.sync_api import sync_playwright
+import requests
 import time
 
 URLS = [
@@ -12,25 +11,19 @@ URLS = [
     "https://mortgage-servicing-orchestrator-8rdfdosxdktbseaxunynfc.streamlit.app",
     "https://mortgage-orchestrator-langgraph-bdritappvbz63jgscch4pmj.streamlit.app",
     "https://arkanexjyotish.streamlit.app",
-    
-    # add more as needed
 ]
 
 def ping_all():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        for url in URLS:
-            try:
-                page = browser.new_page()
-                page.goto(url, wait_until="networkidle")
-                time.sleep(10)
-                page.close()
-                print(f"✓ {url}")
-            except Exception as e:
-                print(f"✗ {url} — {e}")
-        browser.close()
+    for url in URLS:
+        try:
+            r = requests.get(url, timeout=60, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            })
+            print(f"✓ {url} — {r.status_code}")
+        except Exception as e:
+            print(f"✗ {url} — {e}")
 
 while True:
     ping_all()
-    print(f"--- Sleeping 30 minutes ---")
+    print("--- Sleeping 30 minutes ---")
     time.sleep(1800)
